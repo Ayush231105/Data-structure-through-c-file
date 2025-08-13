@@ -1,0 +1,148 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Structure for a node
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+// Function to create a new node
+struct Node* createNode(int value) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = value;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Insert at end (helper to create list quickly)
+void insertAtEnd(struct Node** head, int value) {
+    struct Node* newNode = createNode(value);
+
+    if (*head == NULL) {
+        *head = newNode;
+        return;
+    }
+
+    struct Node* temp = *head;
+    while (temp->next != NULL)
+        temp = temp->next;
+
+    temp->next = newNode;
+}
+
+// Delete at beginning
+void deleteAtBeginning(struct Node** head) {
+    if (*head == NULL) {
+        printf("List is empty.\n");
+        return;
+    }
+    struct Node* temp = *head;
+    *head = (*head)->next;
+    free(temp);
+}
+
+// Delete at end
+void deleteAtEnd(struct Node** head) {
+    if (*head == NULL) {
+        printf("List is empty.\n");
+        return;
+    }
+
+    struct Node* temp = *head;
+
+    if (temp->next == NULL) { // only one node
+        free(temp);
+        *head = NULL;
+        return;
+    }
+
+    struct Node* prev = NULL;
+    while (temp->next != NULL) {
+        prev = temp;
+        temp = temp->next;
+    }
+    prev->next = NULL;
+    free(temp);
+}
+
+// Delete after a given node
+void deleteAfter(struct Node* prevNode) {
+    if (prevNode == NULL || prevNode->next == NULL) {
+        printf("No node exists after the given node.\n");
+        return;
+    }
+    struct Node* temp = prevNode->next;
+    prevNode->next = temp->next;
+    free(temp);
+}
+
+// Display the linked list
+void displayList(struct Node* head) {
+    struct Node* temp = head;
+    while (temp != NULL) {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+
+int main() {
+    struct Node* head = NULL;
+    int choice, value, pos;
+    struct Node* temp;
+
+    // Creating an initial list
+    insertAtEnd(&head, 10);
+    insertAtEnd(&head, 20);
+    insertAtEnd(&head, 30);
+    insertAtEnd(&head, 40);
+
+    while (1) {
+        printf("\n--- Linked List Deletion Menu ---\n");
+        printf("1. Delete at Beginning\n");
+        printf("2. Delete at End\n");
+        printf("3. Delete After a Node\n");
+        printf("4. Display List\n");
+        printf("5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+        case 1:
+            deleteAtBeginning(&head);
+            break;
+
+        case 2:
+            deleteAtEnd(&head);
+            break;
+
+        case 3:
+            printf("Enter value of node after which to delete: ");
+            scanf("%d", &pos);
+
+            temp = head;
+            while (temp != NULL && temp->data != pos) {
+                temp = temp->next;
+            }
+            if (temp == NULL) {
+                printf("Node with value %d not found.\n", pos);
+            } else {
+                deleteAfter(temp);
+            }
+            break;
+
+        case 4:
+            displayList(head);
+            break;
+
+        case 5:
+            exit(0);
+
+        default:
+            printf("Invalid choice. Try again.\n");
+        }
+    }
+
+    return 0;
+}
